@@ -1,10 +1,8 @@
-import Keyboard from "@/component/Keyboard";
-import Image from "next/image";
+import Keyboard from "@/components/keyboard/Keyboard";
 
 export default function Home() {
   return (
     <div>
-      <button>"toto"</button>
       <Keyboard></Keyboard>
     </div>
   );
