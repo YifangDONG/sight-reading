@@ -19,17 +19,19 @@ const isWhiteKey = (pitch: Pitch): boolean => {
 }
 
 const Key = ({ pitch }: { pitch: Pitch }) => {
+  const isWhite = isWhiteKey(pitch);
+  const keyStyle = "flex flex-col justify-end items-center flex-1 cursor-pointer key-height";
+  const whiteKeyStyle = "border bg-white mr-0.5";
+  const blackKeyStyle = "bg-black text-white z-1 black-key mx-[-1rem]";
+
   return (
-    <button 
-    className={isWhiteKey(pitch) ? 
-      "flex-1 border border-black bg-white mr-0.5 cursor-pointer key-height" 
-      : "flex-1 bg-black text-white cursor-pointer z-1 black-key" }
-    onClick={()=>{}}>
-      <span>
-        {toString(pitch)}
-      </span>
+    <button
+      className={`${keyStyle} ${isWhite ? whiteKeyStyle : blackKeyStyle}`}
+      onClick={() => {}}>
+      <span>{toString(pitch)}</span>
     </button>
   );
 };
+
 
   export default Key;
