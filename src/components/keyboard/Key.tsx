@@ -20,7 +20,7 @@ const isWhiteKey = (pitch: Pitch): boolean => {
 
 const Key = ({ pitch }: { pitch: Pitch }) => {
   const isWhite = isWhiteKey(pitch);
-  const keyStyle = "flex flex-col justify-end items-center flex-1 cursor-pointer key-height";
+  const keyStyle = "flex flex-col justify-end items-center flex-1 cursor-pointer key";
   const whiteKeyStyle = "border bg-white mr-0.5";
   const blackKeyStyle = "bg-black text-white z-1 black-key mx-[-1rem]";
 
