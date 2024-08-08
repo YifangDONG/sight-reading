@@ -1,0 +1,7 @@
+.key-height {
+  aspect-ratio: 1 / 6; /* Set the aspect ratio to 1:3.5 */
+}
+
+.black-key {
+    transform: translateY(-35%)
+}

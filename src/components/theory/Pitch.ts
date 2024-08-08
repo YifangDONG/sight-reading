@@ -1,44 +1,45 @@
-interface Pitch {
+type Pitch =  {
     step: 'C' | 'D' | 'E' | 'F' | 'G'| 'A' | 'B'; // Enum for steps
     alter?: '#' | 'b' // Optional alteration, defaults to 'natural'
     octave: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // Possible octave values
 }
+const stepOrder:Pitch["step"][] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 const generatePianoPitchesWithSharp = (): Pitch[] => {
     const pitches: Pitch[] = [];
-    const steps: Pitch["step"][] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const octaves: Pitch["octave"][] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; 
+    const octaves: Pitch["octave"][] = [0, 1, 2, 3, 4, 5, 6, 7]; 
     octaves.forEach(octave => {
-        steps.forEach(step => {
+        stepOrder.forEach(step => {
             pitches.push({ step, octave });
             if (step !== 'E' && step !== 'B') {
                 pitches.push({ step, alter: '#', octave });
             }
         });
     })
+    pitches.push({ step: 'C', octave: 8 });
+    
     return pitches.filter(pitch => {
-        if (pitch.octave === 0 && pitch.step < 'A') return false;
-        if (pitch.octave === 8 && pitch.step > 'C') return false;
+        if (pitch.octave === 0 && stepOrder.indexOf(pitch.step) < stepOrder.indexOf('A')) return false;
         return true;
     });
 }
 const generatePianoPitchesWithFlat = (): Pitch[] => {
     const pitches: Pitch[] = [];
-    const steps: Pitch["step"][] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-    const octaves: Pitch["octave"][] = [0, 1, 2, 3, 4, 5, 6, 7, 8]; 
+    const octaves: Pitch["octave"][] = [ 1, 2, 3, 4, 5, 6, 7]; 
+    pitches.push({ step: 'A', octave: 0 });
+    pitches.push({ step: 'B', alter: 'b', octave: 0 });
+    pitches.push({ step: 'B', octave: 0 });
+
     octaves.forEach(octave => {
-        steps.forEach(step => {
-            pitches.push({ step, octave });
+        stepOrder.forEach(step => {
             if (step !== 'C' && step !== 'F') {
                 pitches.push({ step, alter: 'b', octave });
             }
+            pitches.push({ step, octave });
         });
     })
-    return pitches.filter(pitch => {
-        if (pitch.octave === 0 && pitch.step < 'A') return false;
-        if (pitch.octave === 8 && pitch.step > 'C') return false;
-        return true;
-    });
+    pitches.push({ step: 'C', octave: 8 });
+    return pitches;
 }
 
 // Comparator function for Pitch objects
@@ -49,7 +50,6 @@ const comparePitches = (pitch1: Pitch, pitch2: Pitch): number => {
     }
 
     // If octaves are the same, compare steps
-    const stepOrder = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     const stepIndex1 = stepOrder.indexOf(pitch1.step);
     const stepIndex2 = stepOrder.indexOf(pitch2.step);
     if (stepIndex1 !== stepIndex2) {
@@ -70,9 +70,11 @@ const comparePitches = (pitch1: Pitch, pitch2: Pitch): number => {
         return 0;
     }
 }
+const toString = (pitch: Pitch) => {
+    return `${pitch.step}${pitch.alter === undefined ? '' : pitch.alter}${pitch.octave}`;
+  };
 
-
-export { comparePitches, generatePianoPitchesWithFlat, generatePianoPitchesWithSharp };
+export { comparePitches, generatePianoPitchesWithFlat, generatePianoPitchesWithSharp, toString };
 
 export default Pitch;
 

@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
 import Pitch from '@/components/theory/Pitch';
+import { toString } from '@/components/theory/Pitch';
+import "./keyboard.css";
 
-const showPitch = (pitch: Pitch) => {
-  return `${pitch.step}${pitch.alter === undefined ? '' : pitch.alter}${pitch.octave}`;
-};
+
 
 const isWhiteKey = (pitch: Pitch): boolean => {
   if(pitch.alter === undefined) {
@@ -20,8 +20,14 @@ const isWhiteKey = (pitch: Pitch): boolean => {
 
 const Key = ({ pitch }: { pitch: Pitch }) => {
   return (
-    <button className={isWhiteKey(pitch) ? "key" : "key black"} onClick={()=>{}}>
-        {showPitch(pitch)}
+    <button 
+    className={isWhiteKey(pitch) ? 
+      "flex-1 border border-black bg-white mr-0.5 cursor-pointer key-height" 
+      : "flex-1 bg-black text-white cursor-pointer z-1 black-key" }
+    onClick={()=>{}}>
+      <span>
+        {toString(pitch)}
+      </span>
     </button>
   );
 };

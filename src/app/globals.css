@@ -26,22 +26,6 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-.key {
-  width: 40px;
-  height: 150px;
-  border: 1px solid #000;
-  background-color: #fff;
-  margin-right: 2px;
-  cursor: pointer;
-}
-.key.black {
-  background-color: #000;
-  height: 100px;
-  width: 30px;
-  margin-left: -15px;
-  margin-right: -15px;
-  z-index: 1;
-}
 @layer utilities {
   .text-balance {
     text-wrap: balance;
