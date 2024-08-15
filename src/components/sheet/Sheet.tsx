@@ -1,70 +1,70 @@
-'use client';
-import React,{ Children, useEffect } from 'react';
-import Vex from 'vexflow';
-
+'use client'
+import React, { Children, useEffect } from 'react'
+import Vex from 'vexflow'
+const { Renderer, Stave, StaveNote, Voice, Formatter } = Vex.Flow
+const staveMargin = 10
 const Sheet = () => {
-    useEffect(() => {
-        const div = document.getElementById("sheet-container") as HTMLDivElement;
-        div.innerHTML = '';
-        const renderer = new Vex.Flow.Renderer(div, Vex.Flow.Renderer.Backends.SVG);
-        renderer.resize(800, 500);
-        const ctx = renderer.getContext();
-       
-        var trebleStave = new Vex.Flow.Stave(10, 40, 400);
-        trebleStave.addClef("treble").addTimeSignature("4/4");
-        trebleStave.setContext(ctx).draw();
-       
-        const bassStaveY = trebleStave.getYForLine(5);
-       
-        const bassStave = new Vex.Flow.Stave(10, bassStaveY, 400);
-        bassStave.addClef("bass").addTimeSignature("4/4");
-        bassStave.setContext(ctx).draw();
+  useEffect(() => {
+    const container = document.getElementById('sheet-container') as HTMLDivElement
+    container.innerHTML = '' // TODO if remove this line, the stave is repeat twice
+    const renderer = new Renderer(container, Renderer.Backends.SVG)
+    const width = container.clientWidth
+    const height = 500
+    renderer.resize(width, height)
+    const context = renderer.getContext()
 
-        renderer.resize(div.clientWidth, div.clientHeight)
+    var staveTreble = new Stave(staveMargin, 40, width - 2 * staveMargin)
+    staveTreble.addClef('treble').addTimeSignature('4/4')
+    staveTreble.setContext(context).draw()
 
+    const bassStaveY = staveTreble.getYForLine(5)
 
-        const note1 = new Vex.Flow.StaveNote({clef: "treble", keys: ["c/4", "e/4", "f#/4", "d#/5"], duration: "w" })
-        const note2 = new Vex.Flow.StaveNote({clef: "bass", keys: ["ab/2", "d/3", "f/3", "bb/3"], duration: "w" })
+    const staveBass = new Stave(staveMargin, bassStaveY, width - 2 * staveMargin)
+    staveBass.addClef('bass').addTimeSignature('4/4')
 
-        const voiceTreble = new Vex.Flow.Voice({num_beats: 4, beat_value: 4, resolution:Vex.Flow.RESOLUTION});
-        const voiceBass   = new Vex.Flow.Voice({num_beats: 4, beat_value: 4, resolution:Vex.Flow.RESOLUTION});
- 
-        voiceTreble.addTickables([note1]);
-        voiceBass.addTickables([note2]);
- 
-        var formatter = new Vex.Flow.Formatter();
- 
-        /*
-        formatter.joinVoices is the method which invokes something 
-        that renders the accidentals in the right way without colliding
-        but enter only one voice at a time for aligning the accidentals.
-        You don't want to really join the voices
-        */
-        formatter.joinVoices([voiceTreble]);
-        formatter.joinVoices([voiceBass]);
- 
-        /*
-        align the voices to fit the grand piano staff.
-        They are put in the array all together, but they are not joined together. 
-        In the second argument, you enter only the treble stave as stave here,
-        assuming the bass stave and the treble stave have the same width as they are a grand piano staff
-        */
-        formatter.formatToStave([voiceTreble, voiceBass], trebleStave, {align_rests: true});
- 
-        var maxX = Math.max(trebleStave.getNoteStartX(), bassStave.getNoteStartX());
-        trebleStave.setNoteStartX(maxX);
-        bassStave.setNoteStartX(maxX);
- 
-        //draw voices
-        voiceTreble.draw(ctx, trebleStave);
-        voiceBass.draw(ctx, bassStave);
-    }, []);  
-    return (
-        <div>
-          <div id="sheet-container"></div> 
-        </div>
-    );
-};
+    staveBass.setContext(context).draw()
+    console.log('width : ' + width)
 
+    const notesTreble = new StaveNote({
+      clef: 'treble',
+      keys: ['c/4', 'e/4', 'f#/4', 'd#/5'],
+      duration: 'w'
+    })
+    const notesBass = new StaveNote({
+      clef: 'bass',
+      keys: ['ab/2', 'd/3', 'f/3', 'bb/3'],
+      duration: 'w'
+    })
+    var voiceTreble = new Vex.Flow.Voice({
+      num_beats: 4,
+      beat_value: 4,
+      resolution: Vex.Flow.RESOLUTION
+    })
+    var voiceBass = new Vex.Flow.Voice({
+      num_beats: 4,
+      beat_value: 4,
+      resolution: Vex.Flow.RESOLUTION
+    })
 
-export default Sheet;
+    voiceTreble.addTickables([notesTreble]).setStave(staveTreble)
+    voiceBass.addTickables([notesBass]).setStave(staveBass)
+
+    var formatter = new Vex.Flow.Formatter()
+
+    // Make sure the staves have the same starting point for notes
+    var startX = Math.max(staveTreble.getNoteStartX(), staveBass.getNoteStartX())
+    staveTreble.setNoteStartX(startX)
+    staveBass.setNoteStartX(startX)
+
+    // the treble and bass are joined independently but formatted together
+    formatter.joinVoices([voiceTreble])
+    formatter.joinVoices([voiceBass])
+    formatter.format([voiceTreble, voiceBass], staveTreble.getWidth() - startX)
+
+    voiceTreble.setContext(context).draw()
+    voiceBass.setContext(context).draw()
+  }, [])
+  return <div id="sheet-container" className="mx-auto"></div>
+}
+
+export default Sheet
