@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Vex, { StaveNote } from 'vexflow'
-const { Renderer, Stave, Voice, Formatter } = Vex.Flow
+const { Renderer, Stave, Voice, Beam, Formatter } = Vex.Flow
 const staveMargin = 10
 const Sheet = () => {
   const [containerWidth, setContainerWidth] = useState(window.innerWidth)
@@ -14,18 +14,24 @@ const Sheet = () => {
       beatNumbers: 4,
       beatValues: 4,
       trebleNotes: [
-        new StaveNote({
-          clef: 'treble',
-          keys: ['c/4', 'e/4', 'f#/4', 'd#/5'],
-          duration: 'w'
-        })
+        new StaveNote({ keys: ['c/4'], duration: '8' }),
+        new StaveNote({ keys: ['c/4'], duration: '8' }),
+        new StaveNote({ keys: ['c/4'], duration: '8' }),
+        new StaveNote({ keys: ['c/4'], duration: '8' }),
+        new StaveNote({ keys: ['c/4'], duration: '8' }),
+        new StaveNote({ keys: ['d/4'], duration: '8' }),
+        new StaveNote({ keys: ['b/4'], duration: '8' }),
+        new StaveNote({ keys: ['c/4', 'e/4', 'g/4'], duration: '8' })
       ],
       bassNotes: [
-        new StaveNote({
-          clef: 'bass',
-          keys: ['ab/2', 'd/3', 'f/3', 'bb/3'],
-          duration: 'w'
-        })
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' }),
+        new StaveNote({ clef: 'bass', keys: ['d/3'], duration: '8' })
       ]
     })
     return () => window.removeEventListener('resize', handleResize)
@@ -51,7 +57,7 @@ const drawMusic = (sheetParams: SheetParams) => {
   renderer.resize(width, height)
   const context = renderer.getContext()
 
-  const formatter = new Vex.Flow.Formatter()
+  const formatter = new Formatter()
 
   const timeSignature = `${sheetParams.beatNumbers}/${sheetParams.beatValues}`
 
@@ -61,15 +67,20 @@ const drawMusic = (sheetParams: SheetParams) => {
     staveTreble.addClef('treble').addTimeSignature(timeSignature)
     staveTreble.setContext(context).draw()
 
-    const voiceTreble = new Vex.Flow.Voice({
+    const notes = sheetParams.trebleNotes
+    const voice = new Voice({
       num_beats: sheetParams.beatNumbers,
-      beat_value: sheetParams.beatValues,
-      resolution: Vex.Flow.RESOLUTION
+      beat_value: sheetParams.beatValues
     })
-    voiceTreble.addTickables(sheetParams.trebleNotes).setStave(staveTreble)
-    formatter.joinVoices([voiceTreble])
-    formatter.format([voiceTreble], 4)
-    voiceTreble.setContext(context).draw()
+
+    const beams = Beam.generateBeams(notes)
+    voice.addTickables(notes).setStave(staveTreble)
+    Formatter.FormatAndDraw(context, staveTreble, notes)
+    beams.forEach((beam) => {
+      beam.setContext(context).draw()
+    })
+    formatter.joinVoices([voice])
+    formatter.format([voice], 4)
   }
 
   var staveBass
@@ -79,14 +90,19 @@ const drawMusic = (sheetParams: SheetParams) => {
     staveBass.addClef('bass').addTimeSignature(timeSignature)
     staveBass.setContext(context).draw()
 
-    var voiceBass = new Vex.Flow.Voice({
+    const notes = sheetParams.bassNotes
+    const voice = new Voice({
       num_beats: sheetParams.beatNumbers,
-      beat_value: sheetParams.beatValues,
-      resolution: Vex.Flow.RESOLUTION
+      beat_value: sheetParams.beatValues
     })
-    voiceBass.addTickables(sheetParams.bassNotes).setStave(staveBass)
-    formatter.joinVoices([voiceBass])
-    formatter.format([voiceBass], 4)
-    voiceBass.setContext(context).draw()
+
+    const beams = Beam.generateBeams(notes)
+    voice.addTickables(notes).setStave(staveBass)
+    Formatter.FormatAndDraw(context, staveBass, notes)
+    beams.forEach((beam) => {
+      beam.setContext(context).draw()
+    })
+    formatter.joinVoices([voice])
+    formatter.format([voice], 4)
   }
 }
